@@ -1,2 +1,3 @@
-# market-maker-crypto
-A Market Making project to support algorithmic trading of Crypto Assets 
+# Market Maker Crypto
+
+A Market Making project to support algorithmic trading of Crypto Assets
