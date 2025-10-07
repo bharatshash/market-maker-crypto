@@ -10,7 +10,7 @@ from binance_sdk_spot.spot import (
     ConfigurationWebSocketStreams,
 )
 
-from process_data import process_data as process
+from .process_data import process_data as process
 
 
 # Configure logging
@@ -49,7 +49,3 @@ async def ticker():
     finally:
         if connection:
             await connection.close_connection(close_session=True)
-
-
-if __name__ == "__main__":
-    asyncio.run(ticker())
