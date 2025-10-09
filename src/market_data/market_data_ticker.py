@@ -10,7 +10,7 @@ from binance_sdk_spot.spot import (
     ConfigurationWebSocketStreams,
 )
 
-from .process_data import process_data as process
+from .process_data import process_market_data as process
 
 
 # Configure logging
@@ -19,6 +19,11 @@ logging.basicConfig(level=logging.INFO)
 # Create configuration for the WebSocket Streams
 configuration_ws_streams = ConfigurationWebSocketStreams(
     stream_url=os.getenv("STREAM_URL", SPOT_WS_STREAMS_PROD_URL)
+)
+
+# Testnet Configuration for Websocketstream
+configuration_ws_streams_testnet = ConfigurationWebSocketStreams(
+    stream_url=os.getenv("STREAM_URL", "wss://stream.testnet.binance.vision:9443")
 )
 
 # Initialize Spot client
@@ -40,7 +45,7 @@ async def ticker():
         stream = await connection.ticker(
             symbol="btcusdt",
         )
-        stream.on("message", on_message)
+        stream.on("message",on_message)
 
         await asyncio.sleep(5)
         await stream.unsubscribe()

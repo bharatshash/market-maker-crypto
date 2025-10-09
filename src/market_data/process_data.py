@@ -3,7 +3,12 @@ import json
 import datetime
 from order_manager.market_making import make_market
 
-def process_data(data):
+# def process_exchangeinfo(data):
+#     exchange_dict = json.loads(data)
+#     df = pd.DataFrame([exchange_dict])
+#     print(df)
+
+def process_market_data(data):
     # print(type(data))
     data_dict = json.loads(data)
     df = pd.DataFrame([data_dict])

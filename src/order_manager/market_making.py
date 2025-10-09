@@ -1,12 +1,10 @@
+import asyncio
 import pandas as pd
 import json
 import datetime
 import requests
 
-# Define the Binance API endpoint and related Keys
-binance_api_url = 'https://api.binance.com/api/v3/'
-binance_api_key = 'YOUR_API_KEY'
-binance_api_secret = 'YOUR_API_SECRET'
+from .order_execution import place_order
 
 def make_market(df):
     # Example function to make market based on the processed data
@@ -22,9 +20,15 @@ def make_market(df):
     # Example: Place buy order slightly below mid price and sell order slightly above mid price
     buy_price = mid_price - (spread * 0.1)
     sell_price = mid_price + (spread * 0.1)
+
+    quantity = 0.00847000
     
     # Print the intended orders (replace with actual API calls to place orders)
     print(f"Placing Buy Order: {symbol} at {buy_price}")
+    asyncio.create_task(place_order(symbol, 'BUY', buy_price, quantity, order_type='LIMIT', timeInForce="GTC"))
+    # place_order(symbol, 'BUY', buy_price, quantity, order_type='LIMIT')
+
+
     print(f"Placing Sell Order: {symbol} at {sell_price}")
     
     # Here you would add the code to place orders using Binance API
