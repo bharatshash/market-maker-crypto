@@ -1,6 +1,7 @@
 import pandas as pd
 import json
 import datetime
+import asyncio
 from order_manager.market_making import make_market
 
 # def process_exchangeinfo(data):
@@ -37,5 +38,6 @@ def process_market_data(data):
         'L': 'Last trade Id',
         'n': 'Total number of trades'
     }, inplace=True)
-    print(df)
-    make_market(df)
+    
+    # Since make_market is now async, we need to schedule it to run
+    asyncio.create_task(make_market(df))

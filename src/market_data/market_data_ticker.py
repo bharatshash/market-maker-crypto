@@ -47,7 +47,7 @@ async def ticker():
         )
         stream.on("message",on_message)
 
-        await asyncio.sleep(5)
+        await asyncio.sleep(2)
         await stream.unsubscribe()
     except Exception as e:
         logging.error(f"ticker() error: {e}")

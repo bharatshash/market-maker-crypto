@@ -2,29 +2,14 @@ import asyncio
 import os
 import logging
 
-from binance_common.configuration import ConfigurationWebSocketAPI
-from binance_common.constants import SPOT_WS_API_TESTNET_URL
-from binance_sdk_spot.spot import Spot
 from binance_sdk_spot.websocket_api.models import AccountCommissionResponse
 from binance_sdk_spot.websocket_api.models import OrderPlaceSideEnum
 from binance_sdk_spot.websocket_api.models import OrderPlaceTypeEnum
 from binance_sdk_spot.websocket_api.models import OrderPlaceTimeInForceEnum
+from .websocket_manager import ws_manager
 # from market_data.process_data import process_exchangeinfo
 
-binance_api_url = 'wss://ws-api.testnet.binance.vision/ws-api/v3'
-binance_api_key = 'CSziIqAFEyb2CCTj8MVdzRkKESBXJqXGOo3y4zLI1wbNsgHIA3W4QrJqKLgUxYRZ'
-binance_api_secret = 'uY21UyeY5ppc8xawA695BYdjNUf69I0ES23P8UwELxW9bsfTXQfXKIa3AhhwJpVY'
-
 logging.basicConfig(level=logging.INFO)
-
-configuration_ws_api = ConfigurationWebSocketAPI(
-    api_key = os.getenv("API_KEY", binance_api_key),
-    api_secret = os.getenv("API_SECRET", binance_api_secret),
-    stream_url = os.getenv("STREAM_URL", SPOT_WS_API_TESTNET_URL)
-)
-
-# Initiailize client for WebSocket API
-client_ws_api = Spot(config_ws_api=configuration_ws_api)
 
 # async def get_exchange_info(connection):
 #     exchange_resp = await connection.exchange_info()
@@ -33,12 +18,10 @@ client_ws_api = Spot(config_ws_api=configuration_ws_api)
 
 
 async def place_order(symbol, side, price, quantity, order_type = OrderPlaceTypeEnum["LIMIT"].value, timeInForce = OrderPlaceTimeInForceEnum["GTC"].value):
-    connection = None
-    try:
-        connection = await client_ws_api.websocket_api.create_connection()
-
-        # await exchange_resp = await connection.exchange_info(symbol=symbol)
-
+    """
+    Place an order using the shared WebSocket connection
+    """
+    async def _place_order_operation(connection, symbol, side, price, quantity, order_type, timeInForce):
         response = await connection.order_place(
             symbol=symbol,
             side=OrderPlaceSideEnum[side].value,
@@ -53,13 +36,67 @@ async def place_order(symbol, side, price, quantity, order_type = OrderPlaceType
 
         data = response.data()
         logging.info(f"order_place() response: {data}")
+        return data
 
-
+    try:
+        return await ws_manager.execute_with_retry(
+            _place_order_operation, 
+            symbol, side, price, quantity, order_type, timeInForce
+        )
     except Exception as e:
-        logging.error(f"place_order() connection error: {e}")
-    finally:
-        if connection:
-            await connection.close_connection(close_session=True)
+        logging.error(f"place_order() error: {e}")
+        raise
+
+# async def handle_fill():
 
 
+async def cancel_order(symbol, orig_client_order_id):
+    """
+    Cancel an order using the shared WebSocket connection
+    """
+    async def _cancel_order_operation(connection, symbol, orig_client_order_id):
+        response = await connection.order_cancel(
+            symbol=symbol,
+            orig_client_order_id=orig_client_order_id
+        )
 
+        rate_limits = response.rate_limits
+        logging.info(f"order_cancel() rate limits: {rate_limits}")
+
+        data = response.data()
+        logging.info(f"order_cancel() response: {data}")
+        return data
+
+    try:
+        return await ws_manager.execute_with_retry(
+            _cancel_order_operation, 
+            symbol, orig_client_order_id
+        )
+    except Exception as e:
+        logging.error(f"cancel_order() error: {e}")
+        raise
+
+async def cancel_open_orders(symbol):
+    """
+    Cancel all open orders for a symbol using the shared WebSocket connection
+    """
+    async def _cancel_open_orders_operation(connection, symbol):
+        response = await connection.open_orders_cancel_all(
+            symbol=symbol
+        )
+
+        rate_limits = response.rate_limits
+        logging.info(f"open_orders_cancel_all() rate limits: {rate_limits}")
+
+        data = response.data()
+        logging.info(f"open_orders_cancel_all() response: {data}")
+        return data
+
+    try:
+        return await ws_manager.execute_with_retry(
+            _cancel_open_orders_operation, 
+            symbol
+        )
+    except Exception as e:
+        logging.error(f"cancel_open_orders() error: {e}")
+        raise
