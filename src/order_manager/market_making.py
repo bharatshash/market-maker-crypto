@@ -10,6 +10,8 @@ from .account_info import get_account_info
 from .account_info import allocation
 from .account_info import has_buy_position
 from .account_info import has_active_buy_orders
+from .account_info import has_sell_position
+from .account_info import has_active_sell_orders
 # from .risk_management.risk_calculation import kill_switch
 
 # Configuration parameters
@@ -71,6 +73,37 @@ async def make_market(df):
         print(f"Error checking orders/positions or placing buy order: {e}")
 
     # Here add code to check for active sell order and position and place limit order
+
+    try:
+        has_sell_orders = await has_active_sell_orders(symbol)  # Placeholder for sell order check
+        has_sell_pos = await has_sell_position(symbol)  # Placeholder for sell position check
+
+        # If no active sell order and no active position on sell side
+        if not has_sell_orders and not has_sell_pos:
+            # Compute sell price: ask_price = best_ask + sell_offset
+            ask_price = best_ask + BUY_OFFSET  # Using BUY_OFFSET as placeholder
+            
+            print(f"No active sell order and no sell position detected for {symbol}")
+            print(f"Placing sell order at {ask_price} (best_ask: {best_ask}, offset: {BUY_OFFSET})")
+            
+            # Place limit sell order
+            await place_order(
+                symbol=symbol, 
+                side='SELL', 
+                price=ask_price, 
+                quantity=DEFAULT_QUANTITY, 
+                order_type='LIMIT', 
+                timeInForce='GTC'
+            )
+        else:
+            if has_sell_orders:
+                print(f"Active sell orders exist for {symbol}, skipping sell order placement")
+                # Check for market proximity to existing sell orders here (not implemented)
+            if has_sell_pos:
+                print(f"Active sell position exists for {symbol}, skipping sell order placement")
+
+    except Exception as e:
+        print(f"Error checking orders/positions or placing sell order: {e}")
 
     # If active order exists check whther market came within proximity  
         
