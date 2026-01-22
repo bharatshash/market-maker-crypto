@@ -4,24 +4,20 @@ import logging
 from market_data import ticker
 from market_data import process_data as process
 from order_manager.websocket_manager import ws_manager
+from risk_manager.kill_switch import killSwitch
 # from market_data import process_exchangeinfo
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Define the Binance API endpoint and related Keys
-binance_api_url = 'https://api.binance.com/api/v3/'
-binance_api_key = 'YOUR_API_KEY'
-binance_api_secret = 'YOUR_API_SECRET'
-
 # Global flag for graceful shutdown
 shutdown_flag = False
 
 def signal_handler(signum, frame):
-    """Handle shutdown signals"""
+
     global shutdown_flag
-    logger.info(f"Received signal {signum}, initiating graceful shutdown...")
+    logger.info(f"Initiating shutdown...")
     shutdown_flag = True
 
 async def main():
@@ -33,7 +29,7 @@ async def main():
     signal.signal(signal.SIGTERM, signal_handler)
     
     try:
-        logger.info("Starting Market Maker Application...")
+        logger.info("Starting Market Maker:")
         
         # Initialize the WebSocket connection manager
         logger.info("Initializing WebSocket connection...")

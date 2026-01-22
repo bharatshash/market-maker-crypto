@@ -5,9 +5,7 @@ import logging
 from .websocket_manager import ws_manager
 
 async def get_account_balances():
-    """
-    Get account balances using the shared WebSocket connection
-    """
+
     async def _get_account_balances_operation(connection):
         response = await connection.account_status()
         
@@ -15,13 +13,12 @@ async def get_account_balances():
         if hasattr(response, 'data') and callable(response.data):
             try:
                 data = response.data()
-                # logging.info(f"account_status() response: {data}")
                 return data
             except Exception as e:
                 logging.error(f"Error getting data from response: {e}")
                 return None
         else:
-            logging.error("Response does not have data method or result is not set")
+            logging.error("Response does not have data")
             return None
 
     try:
@@ -31,8 +28,7 @@ async def get_account_balances():
         return None
 
 async def has_buy_position(symbol):
-    """Check if there's an active position on the buy side for the given symbol
-    This checks if we have a non-zero balance of the base asset"""
+    """Check if there's an active position on the buy side for the given symbol"""
     balances = await get_account_balances()
     
     if balances is None:
@@ -73,14 +69,12 @@ async def get_open_orders(symbol):
         if hasattr(response, 'data') and callable(response.data):
             try:
                 data = response.data()
-                logging.info(f"open_orders_status() response type: {type(data)}")
-                logging.info(f"open_orders_status() response: {data}")
                 return data
             except Exception as e:
                 logging.error(f"Error getting data from open_orders response: {e}")
                 return []
         else:
-            logging.error("Open orders response does not have data method or result is not set")
+            logging.error("Open orders response does not have value for data")
             return []
             
     try:        
@@ -91,10 +85,9 @@ async def get_open_orders(symbol):
         return []
 
 async def has_active_buy_orders(symbol):
-    """Check if there are any active BUY orders for the given symbol"""
+
     open_orders = await get_open_orders(symbol)
-    
-    # Handle different response types
+
     if open_orders is None:
         return False
     
@@ -135,15 +128,13 @@ async def has_active_buy_orders(symbol):
     return False
 
 async def has_sell_position(symbol):
-    """Check if there's an active position on the sell side for the given symbol
-    This checks if we have a non-zero balance of the quote asset"""
+
     balances = await get_account_balances()
 
     base_asset = symbol.replace('USDT', '').replace('BUSD', '').replace('BTC', '').replace('ETH', '')
     
     if balances is None:
         return False
-    
     
     # Check if we have any balance of the base asset
     if 'balances' in balances:
@@ -219,7 +210,7 @@ async def get_account_info():
                 logging.error(f"Error getting data from get_account_info response: {e}")
                 return None
         else:
-            logging.error("Account info response does not have data method or result is not set")
+            logging.error("Account info response does not have data value")
             return None
 
     try:
@@ -229,30 +220,23 @@ async def get_account_info():
         return None
 
 async def allocation(symbol):
-    """
-    Get allocations for a symbol using the shared WebSocket connection
-    """
+    """Get allocations for a symbol"""
     async def _allocation_operation(connection, symbol):
         response = await connection.my_allocations(
             symbol=symbol,
         )
 
-        # Check rate limits first
-        if hasattr(response, 'rate_limits'):
-            rate_limits = response.rate_limits
-            logging.info(f"my_allocations() rate limits: {rate_limits}")
 
         # Check if response has data before accessing it
         if hasattr(response, 'data') and callable(response.data):
             try:
                 data = response.data()
-                logging.info(f"my_allocations() response: {data}")
                 return data
             except Exception as e:
                 logging.error(f"Error getting data from allocation response: {e}")
                 return None
         else:
-            logging.error("Allocation response does not have data method or result is not set")
+            logging.error("Allocation response does not have data value")
             return None
 
     try:

@@ -7,9 +7,14 @@ from binance_common.configuration import ConfigurationWebSocketAPI
 from binance_common.constants import SPOT_WS_API_TESTNET_URL
 from binance_sdk_spot.spot import Spot
 
+# Define the Binance API endpoint and related Keys
+binance_api_url = 'https://api.binance.com/api/v3/'
+binance_api_key = 'CSziIqAFEyb2CCTj8MVdzRkKESBXJqXGOo3y4zLI1wbNsgHIA3W4QrJqKLgUxYRZ'
+binance_api_secret = 'uY21UyeY5ppc8xawA695BYdjNUf69I0ES23P8UwELxW9bsfTXQfXKIa3AhhwJpVY'
+
 class WebSocketConnectionManager:
     """
-    Singleton class to manage a single WebSocket connection throughout the application
+    Class to manage WebSocket connection in the application
     """
     
     _instance = None
@@ -25,8 +30,8 @@ class WebSocketConnectionManager:
     
     def __init__(self):
         if not hasattr(self, 'initialized'):
-            self.binance_api_key = 'CSziIqAFEyb2CCTj8MVdzRkKESBXJqXGOo3y4zLI1wbNsgHIA3W4QrJqKLgUxYRZ'
-            self.binance_api_secret = 'uY21UyeY5ppc8xawA695BYdjNUf69I0ES23P8UwELxW9bsfTXQfXKIa3AhhwJpVY'
+            self.binance_api_key = binance_api_key
+            self.binance_api_secret = binance_api_secret
             
             # Create configuration for the WebSocket API
             self.configuration_ws_api = ConfigurationWebSocketAPI(

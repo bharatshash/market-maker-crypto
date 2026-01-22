@@ -41,3 +41,4 @@ def process_market_data(data):
     
     # Since make_market is now async, we need to schedule it to run
     asyncio.create_task(make_market(df))
+    
