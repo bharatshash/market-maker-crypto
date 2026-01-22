@@ -2,32 +2,37 @@
 
 A Market Making project to support algorithmic trading of Crypto Assets
 
-RUNNING CODE:
-->From src run 'py .\main.py'
+> Binance Documentation used: https://developers.binance.com/docs/binance-spot-api-docs/
+> Binance GitHub Link: https://github.com/binance/binance-connector-python/tree/master/clients/spot
 
-CURRENT FEATURES/WORKFLOW
--> Receives data stream from websocket
+## RUNNING CODE:
 
--> With every ticker data is processed into data frame for market making
+->From src run `py .\main.py'`
 
-->Have a Websocket manager to maintain a single connection for all requests rather than repeated connect and disconnect for each reconnect
+### CURRENT FEATURES/WORKFLOW
 
--> Seperate Buy side and sell side logics (not a single function since has internal seperate buy and sell side function calls)
+- Receives data stream from websocket
 
--> Cancel order functions
+- With every ticker data is processed into data frame for market making
 
--> Active kill switch to cancel all open order on market fluctuation more than 5%
+- Have a Websocket manager to maintain a single connection for all requests rather than repeated connect and disconnect for each reconnect
 
--> Runs only for few seconds to allow proper testing and avoid depleting Binance testnet funds(Happened way too many times lol)
+- Seperate Buy side and sell side logics (not a single function since has internal seperate buy and sell side function calls)
 
-FUTURE FEATURES/YET TO BE IMPLEMENTED
+- Cancel order functions
 
--> Multithreading to run buy/sell side together , potentially run multiple symbols together
+- Active kill switch to cancel all open order on market fluctuation more than 5%
 
--> Trade execution based on proper strategy and pricing using plug and play modules
+- Runs only for few seconds to allow proper testing and avoid depleting Binance testnet funds(Happened way too many times lol)
 
--> Testing of KILL SWITCH based on price fluctuations
+### FUTURE FEATURES/YET TO BE IMPLEMENTED
 
--> Maintaining a local database/orderbook
+- Multithreading to run buy/sell side together , potentially run multiple symbols together
 
--> Have a proper config file when strategy is established (or when code is more prod ready)
+- Trade execution based on proper strategy and pricing using plug and play modules
+
+- Testing of KILL SWITCH based on price fluctuations
+
+- Maintaining a local database/orderbook
+
+- Have a proper config file when strategy is established (or when code is more prod ready)
