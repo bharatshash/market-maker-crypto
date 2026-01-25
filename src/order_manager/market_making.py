@@ -4,6 +4,7 @@ import json
 import datetime
 import requests
 import concurrent.futures
+import threading
 
 from .order_execution import cancel_open_orders, place_order
 from .order_execution import cancel_order
@@ -18,7 +19,7 @@ from risk_manager.kill_switch import kill_switch
 # from .risk_management.risk_calculation import kill_switch
 
 # Configuration parameters
-BUY_OFFSET = 0.01  # Offset to subtract from best_bid for buy orders (in price units)
+BUY_OFFSET = 1000  # Offset to subtract from best_bid for buy orders (in price units)
 DEFAULT_QUANTITY = 0.00847000  # Default quantity for orders
 
 
@@ -51,6 +52,7 @@ async def run_buy_side(symbol, best_bid):
             if has_buy_orders:
                 print(f"Active buy orders exist for {symbol}, skipping order")
                 # Check for market proximity to existing buy orders here (not implemented)
+                
             if has_buy_pos:
                 print(f"Active buy position exists for {symbol}, skipping order")
                 
@@ -127,8 +129,11 @@ async def make_market(df):
     #     sell_future = loop.run_in_executor(executor, asyncio.run, run_sell_side(symbol, best_ask))
     #     await asyncio.gather(buy_future, sell_future)
 
+    # threading.Thread(target=asyncio.run, args=(run_buy_side(symbol, best_bid),)).start()
+    # threading.Thread(target=asyncio.run, args=(run_sell_side(symbol, best_ask),)).start()
+
     await run_buy_side(symbol, best_bid)
-    # await run_sell_side(symbol, best_ask)
+    await run_sell_side(symbol, best_ask)
  
     
     # Print the intended orders (replace with actual API calls to place orders)

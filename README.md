@@ -5,6 +5,13 @@ A Market Making project to support algorithmic trading of Crypto Assets
 > Binance Documentation used: https://developers.binance.com/docs/binance-spot-api-docs/
 > Binance GitHub Link: https://github.com/binance/binance-connector-python/tree/master/clients/spot
 
+## SETUP
+
+Ensure you have the latest version of Python and pip then run the following commands to install the dependencies
+
+> `pip install pandas`
+> `pip install binance-sdk-spot`
+
 ## RUNNING CODE:
 
 ->From src run `py .\main.py'`

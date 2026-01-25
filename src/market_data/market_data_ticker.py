@@ -51,7 +51,7 @@ async def ticker():
 
         # Temporary sleep function until we have a proper shutdown mechanism
         # Not establishing full time connection because limit of funds in binance testnet
-        await asyncio.sleep(2)
+        await asyncio.sleep(5)
         await stream.unsubscribe()
     except Exception as e:
         logging.error(f"ticker() error: {e}")
