@@ -34,11 +34,9 @@ Ensure you have the latest version of Python and pip then run the following comm
 
 ### FUTURE FEATURES/YET TO BE IMPLEMENTED
 
-- Multithreading to run buy/sell side together , potentially run multiple symbols together
+- Multithreading to run multiple symbols together, buy or sell side might not need it because of place order being async
 
 - Trade execution based on proper strategy and pricing using plug and play modules
-
-- Testing of KILL SWITCH based on price fluctuations
 
 - Maintaining a local database/orderbook
 

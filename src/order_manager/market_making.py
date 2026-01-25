@@ -121,7 +121,7 @@ async def make_market(df):
         cancel_open_orders(symbol)
         return
 
-
+    # Multithreading may be unnessary here since asyncio is being used
     # Add block for adding threads executer for buy side and sell side
     # with concurrent.futures.ThreadPoolExecutor() as executor:
     #     loop = asyncio.get_event_loop()
@@ -135,10 +135,7 @@ async def make_market(df):
     await run_buy_side(symbol, best_bid)
     await run_sell_side(symbol, best_ask)
  
-    
-    # Print the intended orders (replace with actual API calls to place orders)
-    # print(f"Placing Buy Order: {symbol} at {buy_price}")
-    # # asyncio.create_task(place_order(symbol, 'BUY', buy_price, quantity, order_type='LIMIT', timeInForce="GTC"))
+
 
     # orderId = 'nRS6OvQsX93tUsM0B0UMcz'
     # print(f"Cancelling Buy Order: {symbol} for {orderId}")
@@ -146,15 +143,8 @@ async def make_market(df):
     # # asyncio.create_task(cancel_order(symbol, orderId))
 
 
-    # print(f"Placing Sell Order: {symbol} at {sell_price}")
-
     # asyncio.create_task(get_account_info())
     # asyncio.create_task(allocation(symbol))
     
-    # Here you would add the code to place orders using Binance API
-    # For example:
-    # place_order(symbol, 'BUY', buy_price, quantity)
-    # place_order(symbol, 'SELL', sell_price, quantity)
-
     # await get_account_info()
 
