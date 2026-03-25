@@ -27,29 +27,40 @@ async def get_account_balances():
         logging.error(f"get_account_balances() error: {e}")
         return None
 
+
+def extract_base_asset(symbol):
+    for quote in ['USDT', 'BUSD', 'BTC', 'ETH']:
+        if symbol.endswith(quote):
+            return symbol[:-len(quote)]
+    return symbol  # fallback if no known quote asset
+
 async def has_buy_position(symbol):
     """Check if there's an active position on the buy side for the given symbol"""
     balances = await get_account_balances()
-    
+
     if balances is None:
         return False
     
     # Extract base asset from symbol (e.g., 'BTC' from 'BTCUSDT')
     # This is a simple approach - might need refinement based on actual symbol formats
-    base_asset = symbol.replace('USDT', '').replace('BUSD', '').replace('BTC', '').replace('ETH', '')
-    
+    base_asset = extract_base_asset(symbol)
+
     # Check if we have any balance of the base asset
-    if 'balances' in balances:
-        for balance in balances['balances']:
-            if balance.get('asset') == base_asset:
-                free_balance = float(balance.get('free', 0))
-                locked_balance = float(balance.get('locked', 0))
+
+    result = balances.result
+    if hasattr(result, 'balances'):
+        for balance in result.balances:
+            if balance.asset == base_asset:
+                free_balance = float(balance.free)
+                locked_balance = float(balance.locked)
                 total_balance = free_balance + locked_balance
                 
                 # Consider position exists if total balance > 0
                 if total_balance > 0:
+                    print(f"Found active BUY position for {symbol}: {total_balance} {base_asset}")
                     return True
     
+    print(f"No active BUY position found for {symbol}")
     return False
 
 async def get_open_orders(symbol):
@@ -63,7 +74,7 @@ async def get_open_orders(symbol):
         # Check rate limits first
         if hasattr(response, 'rate_limits'):
             rate_limits = response.rate_limits
-            logging.info(f"open_orders_status() rate limits: {rate_limits}")
+            # logging.info(f"open_orders_status() rate limits: {rate_limits}")
 
         # Check if response has data before accessing it
         if hasattr(response, 'data') and callable(response.data):
@@ -86,6 +97,7 @@ async def get_open_orders(symbol):
 
 async def has_active_buy_orders(symbol):
 
+    print(f"Checking for active BUY orders for {symbol}...")
     open_orders = await get_open_orders(symbol)
 
     if open_orders is None:
@@ -123,6 +135,7 @@ async def has_active_buy_orders(symbol):
     # Check if any of the open orders are BUY orders
     for order in orders_to_check:
         if isinstance(order, dict) and order.get('side') == 'BUY':
+            print(f"Found active BUY order for {symbol}: {order}")
             return True
     
     return False
@@ -131,23 +144,27 @@ async def has_sell_position(symbol):
 
     balances = await get_account_balances()
 
-    base_asset = symbol.replace('USDT', '').replace('BUSD', '').replace('BTC', '').replace('ETH', '')
+    base_asset = extract_base_asset(symbol)
     
     if balances is None:
         return False
     
-    # Check if we have any balance of the base asset
-    if 'balances' in balances:
-        for balance in balances['balances']:
-            if balance.get('asset') == base_asset:
-                free_balance = float(balance.get('free', 0))
-                locked_balance = float(balance.get('locked', 0))
+    result = balances.result
+
+    if hasattr(result, 'balances'):
+        for balance in result.balances:
+            if balance.asset == base_asset:
+                free_balance = float(balance.free)
+                locked_balance = float(balance.locked)
                 total_balance = free_balance + locked_balance
                 
                 # Consider position exists if total balance > 0
                 if total_balance > 0:
+                    print(f"Found active SELL position for {symbol}: {total_balance} {base_asset}")
                     return True
 
+    print(f"No active SELL position found for {symbol}")
+    return False
 
 async def has_active_sell_orders(symbol):
     """Check if there are any active SELL orders for the given symbol"""
