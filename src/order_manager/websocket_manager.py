@@ -3,14 +3,20 @@ import os
 import logging
 from typing import Optional
 
+from dotenv import load_dotenv
 from binance_common.configuration import ConfigurationWebSocketAPI
 from binance_common.constants import SPOT_WS_API_TESTNET_URL
 from binance_sdk_spot.spot import Spot
 
-# Define the Binance API endpoint and related Keys
-binance_api_url = 'https://api.binance.com/api/v3/'
-binance_api_key = 'CSziIqAFEyb2CCTj8MVdzRkKESBXJqXGOo3y4zLI1wbNsgHIA3W4QrJqKLgUxYRZ'
-binance_api_secret = 'uY21UyeY5ppc8xawA695BYdjNUf69I0ES23P8UwELxW9bsfTXQfXKIa3AhhwJpVY'
+# # Define the Binance API endpoint and related Keys
+# API_KEY = os.getenv("API_KEY")
+# API_SECRET = os.getenv("API_SECRET")
+# stream_url = os.getenv("STREAM_URL")
+
+load_dotenv()
+API_KEY = os.getenv("API_KEY")
+API_SECRET = os.getenv("API_SECRET")
+STREAM_URL = os.getenv("STREAM_URL")
 
 class WebSocketConnectionManager:
     """
@@ -30,13 +36,13 @@ class WebSocketConnectionManager:
     
     def __init__(self):
         if not hasattr(self, 'initialized'):
-            self.binance_api_key = binance_api_key
-            self.binance_api_secret = binance_api_secret
+            self.API_KEY = API_KEY
+            self.API_SECRET = API_SECRET
             
             # Create configuration for the WebSocket API
             self.configuration_ws_api = ConfigurationWebSocketAPI(
-                api_key=os.getenv("API_KEY", self.binance_api_key),
-                api_secret=os.getenv("API_SECRET", self.binance_api_secret),
+                api_key=os.getenv("API_KEY", self.API_KEY),
+                api_secret=os.getenv("API_SECRET", self.API_SECRET),
                 stream_url=os.getenv("STREAM_URL", SPOT_WS_API_TESTNET_URL),
             )
             

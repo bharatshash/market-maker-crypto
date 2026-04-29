@@ -99,6 +99,7 @@ async def has_active_buy_orders(symbol):
 
     print(f"Checking for active BUY orders for {symbol}...")
     open_orders = await get_open_orders(symbol)
+    print(f"This section runs!")
 
     if open_orders is None:
         return False
