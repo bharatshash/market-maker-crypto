@@ -10,11 +10,12 @@ import os
 import logging
 
 from .websocket_manager import ws_manager
+from typing import Any, Optional, List, Dict
 
-async def get_account_balances():
+async def get_account_balances() -> Optional[Any]:
     """Get all user's account balances"""
     
-    async def _get_account_balances_operation(connection):
+    async def _get_account_balances_operation(connection: Any) -> Optional[Any]:
         response = await connection.account_status()
         
         # Check if response has data before accessing it
@@ -23,7 +24,7 @@ async def get_account_balances():
                 data = response.data()
                 return data
             except Exception as e:
-                logging.error(f"Error getting data from response: {e}")
+                logging.exception(f"Error getting data from response: {e}")
                 return None
         else:
             logging.error("Response does not have data")
@@ -32,17 +33,16 @@ async def get_account_balances():
     try:
         return await ws_manager.execute_with_retry(_get_account_balances_operation)
     except Exception as e:
-        logging.error(f"get_account_balances() error: {e}")
+        logging.exception(f"get_account_balances() error: {e}")
         return None
 
-
-def extract_base_asset(symbol):
+def extract_base_asset(symbol: str) -> str:
     for quote in ['USDT', 'BUSD', 'BTC', 'ETH']:
         if symbol.endswith(quote):
             return symbol[:-len(quote)]
     return symbol  # fallback if no known quote asset
 
-async def has_buy_position(symbol):
+async def has_buy_position(symbol: str) -> bool:
     """Check if there's an active position on the buy side for the given symbol"""
     balances = await get_account_balances()
 
@@ -65,16 +65,16 @@ async def has_buy_position(symbol):
                 
                 # Consider position exists if total balance > 0
                 if total_balance > 0:
-                    print(f"Found active BUY position for {symbol}: {total_balance} {base_asset}")
+                    logging.info(f"Found active BUY position for {symbol}: {total_balance} {base_asset}")
                     return True
     
-    print(f"No active BUY position found for {symbol}")
+    logging.info(f"No active BUY position found for {symbol}")
     return False
 
-async def get_open_orders(symbol):
+async def get_open_orders(symbol: str) -> Any:
     """Get all open orders for a symbol and return the data"""
 
-    async def _get_open_orders_operation(connection, symbol):
+    async def _get_open_orders_operation(connection: Any, symbol: str) -> Any:
         response = await connection.open_orders_status(
             symbol=symbol
         )
@@ -90,7 +90,7 @@ async def get_open_orders(symbol):
                 data = response.data()
                 return data
             except Exception as e:
-                logging.error(f"Error getting data from open_orders response: {e}")
+                logging.exception(f"Error getting data from open_orders response: {e}")
                 return []
         else:
             logging.error("Open orders response does not have value for data")
@@ -100,15 +100,14 @@ async def get_open_orders(symbol):
         return await ws_manager.execute_with_retry(_get_open_orders_operation, symbol)
 
     except Exception as e:
-        logging.error(f"get_open_orders() connection error: {e}")
+        logging.exception(f"get_open_orders() connection error: {e}")
         return []
 
-async def has_active_buy_orders(symbol):
+async def has_active_buy_orders(symbol: str) -> bool:
     """Check if there are any active BUY orders for the given symbol"""
     
-    print(f"Checking for active BUY orders for {symbol}...")
+    logging.info(f"Checking for active BUY orders for {symbol}...")
     open_orders = await get_open_orders(symbol)
-    print(f"This section runs!")
 
     if open_orders is None:
         return False
@@ -145,12 +144,12 @@ async def has_active_buy_orders(symbol):
     # Check if any of the open orders are BUY orders
     for order in orders_to_check:
         if isinstance(order, dict) and order.get('side') == 'BUY':
-            print(f"Found active BUY order for {symbol}: {order}")
+            logging.info(f"Found active BUY order for {symbol}: {order}")
             return True
     
     return False
 
-async def has_sell_position(symbol):
+async def has_sell_position(symbol: str) -> bool:
     """Check if there's a position on the sell side for the given symbol"""
 
     balances = await get_account_balances()
@@ -171,13 +170,13 @@ async def has_sell_position(symbol):
                 
                 # Consider position exists if total balance > 0
                 if total_balance > 0:
-                    print(f"Found active SELL position for {symbol}: {total_balance} {base_asset}")
+                    logging.info(f"Found active SELL position for {symbol}: {total_balance} {base_asset}")
                     return True
 
-    print(f"No active SELL position found for {symbol}")
+    logging.info(f"No active SELL position found for {symbol}")
     return False
 
-async def has_active_sell_orders(symbol):
+async def has_active_sell_orders(symbol: str) -> bool:
     """Check if there are any active SELL orders for the given symbol"""
     open_orders = await get_open_orders(symbol)
     
@@ -221,11 +220,11 @@ async def has_active_sell_orders(symbol):
     
     return False
 
-async def get_account_info():
+async def get_account_info() -> Optional[Any]:
     """
     Get account information using the shared WebSocket connection
     """
-    async def _get_account_info_operation(connection):
+    async def _get_account_info_operation(connection: Any) -> Optional[Any]:
         response = await connection.account_status()
         
         # Check if response has data before accessing it
@@ -235,7 +234,7 @@ async def get_account_info():
                 logging.info(f"account_status() response: {data}")
                 return data
             except Exception as e:
-                logging.error(f"Error getting data from get_account_info response: {e}")
+                logging.exception(f"Error getting data from get_account_info response: {e}")
                 return None
         else:
             logging.error("Account info response does not have data value")
@@ -244,12 +243,12 @@ async def get_account_info():
     try:
         return await ws_manager.execute_with_retry(_get_account_info_operation)
     except Exception as e:
-        logging.error(f"get_account_info() error: {e}")
+        logging.exception(f"get_account_info() error: {e}")
         return None
 
-async def allocation(symbol):
+async def allocation(symbol: str) -> Optional[Any]:
     """Get all the user's allocations for a symbol"""
-    async def _allocation_operation(connection, symbol):
+    async def _allocation_operation(connection: Any, symbol: str) -> Optional[Any]:
         response = await connection.my_allocations(
             symbol=symbol,
         )
@@ -261,7 +260,7 @@ async def allocation(symbol):
                 data = response.data()
                 return data
             except Exception as e:
-                logging.error(f"Error getting data from allocation response: {e}")
+                logging.exception(f"Error getting data from allocation response: {e}")
                 return None
         else:
             logging.error("Allocation response does not have data value")
@@ -273,6 +272,6 @@ async def allocation(symbol):
             symbol
         )
     except Exception as e:
-        logging.error(f"allocation() error: {e}")
+        logging.exception(f"allocation() error: {e}")
         return None
 

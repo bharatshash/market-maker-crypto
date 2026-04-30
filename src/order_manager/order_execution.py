@@ -24,15 +24,22 @@ from binance_sdk_spot.websocket_api.models import OrderPlaceSideEnum
 from binance_sdk_spot.websocket_api.models import OrderPlaceTypeEnum
 from binance_sdk_spot.websocket_api.models import OrderPlaceTimeInForceEnum
 from .websocket_manager import ws_manager
-# from market_data.process_data import process_exchangeinfo
+from typing import Any, Optional
 
 logging.basicConfig(level=logging.INFO)
 
 
-async def place_order(symbol, side, price, quantity, order_type = OrderPlaceTypeEnum["LIMIT"].value, timeInForce = OrderPlaceTimeInForceEnum["GTC"].value):
+async def place_order(
+    symbol: str, 
+    side: str, 
+    price: float, 
+    quantity: float, 
+    order_type: str = OrderPlaceTypeEnum["LIMIT"].value, 
+    timeInForce: str = OrderPlaceTimeInForceEnum["GTC"].value
+) -> Optional[Any]:
     """Place an order in the market"""
     
-    async def _place_order_operation(connection, symbol, side, price, quantity, order_type, timeInForce):
+    async def _place_order_operation(connection: Any, symbol: str, side: str, price: float, quantity: float, order_type: str, timeInForce: str) -> Optional[Any]:
         response = await connection.order_place(
             symbol=symbol,
             side=OrderPlaceSideEnum[side].value,
@@ -49,7 +56,7 @@ async def place_order(symbol, side, price, quantity, order_type = OrderPlaceType
                 # logging.info(f"order_place() response: {data}")
                 return data
             except Exception as e:
-                logging.error(f"Data Error: {e}")
+                logging.exception(f"Data Error: {e}")
                 return None
         else:
             logging.error("Data might not exist")
@@ -61,13 +68,13 @@ async def place_order(symbol, side, price, quantity, order_type = OrderPlaceType
             symbol, side, price, quantity, order_type, timeInForce
         )
     except Exception as e:
-        logging.error(f"Error placing order: {e}")
+        logging.exception(f"Error placing order: {e}")
         raise
 
 
-async def cancel_order(symbol, orig_client_order_id):
+async def cancel_order(symbol: str, orig_client_order_id: str) -> Optional[Any]:
     """Cancel an order in the market"""
-    async def _cancel_order_operation(connection, symbol, orig_client_order_id):
+    async def _cancel_order_operation(connection: Any, symbol: str, orig_client_order_id: str) -> Optional[Any]:
         response = await connection.order_cancel(
             symbol=symbol,
             orig_client_order_id=orig_client_order_id
@@ -80,7 +87,7 @@ async def cancel_order(symbol, orig_client_order_id):
                 logging.info(f"order_cancel() response: {data}")
                 return data
             except Exception as e:
-                logging.error(f"Error getting data response: {e}")
+                logging.exception(f"Error getting data response: {e}")
                 return None
         else:
             logging.error("Order cancel response does not have data value")
@@ -92,12 +99,12 @@ async def cancel_order(symbol, orig_client_order_id):
             symbol, orig_client_order_id
         )
     except Exception as e:
-        logging.error(f"cancel_order() error: {e}")
+        logging.exception(f"cancel_order() error: {e}")
         raise
 
-async def cancel_open_orders(symbol):
+async def cancel_open_orders(symbol: str) -> Optional[Any]:
     """Cancel all open orders for a symbol"""
-    async def _cancel_open_orders_operation(connection, symbol):
+    async def _cancel_open_orders_operation(connection: Any, symbol: str) -> Optional[Any]:
         response = await connection.open_orders_cancel_all(
             symbol=symbol
         )
@@ -112,5 +119,5 @@ async def cancel_open_orders(symbol):
             symbol
         )
     except Exception as e:
-        logging.error(f"cancel_open_orders() error: {e}")
+        logging.exception(f"cancel_open_orders() error: {e}")
         raise

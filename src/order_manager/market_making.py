@@ -33,12 +33,13 @@ from .account_info import has_sell_position
 from .account_info import has_active_sell_orders
 from risk_manager.kill_switch import kill_switch
 
-# Configuration parameters
-BUY_OFFSET = 1000  # Offset to subtract from best_bid for buy orders (in price units)
-DEFAULT_QUANTITY = 0.00847000  # Default quantity for orders
+import logging
+from config import BUY_OFFSET, DEFAULT_QUANTITY
+
+logger = logging.getLogger(__name__)
 
 
-async def run_buy_side(symbol, best_bid):
+async def run_buy_side(symbol: str, best_bid: float) -> None:
      # Check if there are active buy orders and buy positions
     try:
         # has_buy_orders = asyncio.create_task(has_active_buy_orders(symbol))
@@ -52,7 +53,7 @@ async def run_buy_side(symbol, best_bid):
             # Compute buy price: bid_price = best_bid - buy_offset 
             bid_price = best_bid - BUY_OFFSET
 
-            print(f"Placing buy order at {bid_price} (best_bid: {best_bid}, offset: {BUY_OFFSET})")
+            logger.info(f"Placing buy order at {bid_price} (best_bid: {best_bid}, offset: {BUY_OFFSET})")
             
             # Place limit buy order
             await place_order(
@@ -65,16 +66,16 @@ async def run_buy_side(symbol, best_bid):
             )
         else:
             if has_buy_orders:
-                print(f"Active buy orders exist for {symbol}, skipping order")
+                logger.info(f"Active buy orders exist for {symbol}, skipping order")
                 # Check for market proximity to existing buy orders here (not implemented)
                 
             if has_buy_pos:
-                print(f"Active buy position exists for {symbol}, skipping order")
+                logger.info(f"Active buy position exists for {symbol}, skipping order")
                 
     except Exception as e:
-        print(f"Error checking orders/positions or placing buy order: {e}")
+        logger.exception(f"Error checking orders/positions or placing buy order: {e}")
 
-async def run_sell_side(symbol, best_ask):
+async def run_sell_side(symbol: str, best_ask: float) -> None:
      # Here add code to check for active sell order and position and place limit order
 
     try:
@@ -86,7 +87,7 @@ async def run_sell_side(symbol, best_ask):
             # Compute sell price: ask_price = best_ask + sell_offset
             ask_price = best_ask + BUY_OFFSET  # Using BUY_OFFSET as placeholder
             
-            print(f"Placing sell order at {ask_price} (best_ask: {best_ask}, offset: {BUY_OFFSET})")
+            logger.info(f"Placing sell order at {ask_price} (best_ask: {best_ask}, offset: {BUY_OFFSET})")
             
             # Place limit sell order
             await place_order(
@@ -99,15 +100,15 @@ async def run_sell_side(symbol, best_ask):
             )
         else:
             if has_sell_orders:
-                print(f"Active sell orders exist for {symbol}, skipping order")
+                logger.info(f"Active sell orders exist for {symbol}, skipping order")
                 # Check for market proximity to existing sell orders here (not implemented)
             if has_sell_pos:
-                print(f"Active sell position exists for {symbol}, skipping order")
+                logger.info(f"Active sell position exists for {symbol}, skipping order")
 
     except Exception as e:
-        print(f"Error checking orders/positions or placing sell order: {e}")
+        logger.exception(f"Error checking orders/positions or placing sell order: {e}")
 
-async def make_market(df):
+async def make_market(df: pd.DataFrame) -> None:
     
 
     # Extract market data from the processed data
@@ -119,21 +120,14 @@ async def make_market(df):
      # Define your market making strategy here
 
     spread = best_ask  - best_bid
-    mid_price = (best_ask + best_bid) / 2
     
-    # Example: Place buy order slightly below mid price and sell order slightly above mid price
-    buy_price = mid_price - (spread * 0.1)
-    sell_price = mid_price + (spread * 0.1)
-
-    quantity = 0.00847000
-
     # If kill switch is activated, do not make market and then cancel all orders
     
-    kill_switch.check_kill(float(mid_price))
+    kill_switch.check_kill(float((best_ask + best_bid) / 2))
 
     if(kill_switch.is_active()):
-        print("Kill switch activated. Cancelling all orders.")
-        cancel_open_orders(symbol)
+        logger.warning("Kill switch activated. Cancelling all orders.")
+        await cancel_open_orders(symbol)
         return
 
     await asyncio.gather(
@@ -153,4 +147,3 @@ async def make_market(df):
     # asyncio.create_task(allocation(symbol))
     
     # await get_account_info()
-

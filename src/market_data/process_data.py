@@ -8,9 +8,13 @@ import pandas as pd
 import json
 import datetime
 import asyncio
+from typing import Set
 from order_manager.market_making import make_market
 
-def process_market_data(data):
+# Keep a strong reference to background tasks
+background_tasks: Set[asyncio.Task] = set()
+
+def process_market_data(data: str) -> None:
     # print(type(data))
     data_dict = json.loads(data)
     df = pd.DataFrame([data_dict])
@@ -40,6 +44,8 @@ def process_market_data(data):
         'n': 'Total number of trades'
     }, inplace=True)
     
-    # Since make_market is now async, we need to schedule it to run
-    asyncio.create_task(make_market(df))
+    # Since make_market is now async, we need to schedule it to run and keep a strong reference
+    task = asyncio.create_task(make_market(df))
+    background_tasks.add(task)
+    task.add_done_callback(background_tasks.discard)
     

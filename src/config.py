@@ -8,3 +8,7 @@ TICKER_TEST_RUN_TIME = 10
 # KILL SWITCH BOOL VARIABLE
 KILL_SWITCH_THRESHOLD = 5
 # MINIMUM PROFIT
+
+# TRADING PARAMETERS
+BUY_OFFSET = 1000  # Offset to subtract from best_bid for buy orders (in price units)
+DEFAULT_QUANTITY = 0.00847000  # Default quantity for orders

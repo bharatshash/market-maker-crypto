@@ -4,11 +4,13 @@ import logging
 from market_data import ticker
 from market_data import process_data as process
 from order_manager.websocket_manager import ws_manager
-from risk_manager.kill_switch import killSwitch
-# from market_data import process_exchangeinfo
+from risk_manager.kill_switch import kill_switch
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
+# Configure console logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
 logger = logging.getLogger(__name__)
 
 # Global flag for graceful shutdown

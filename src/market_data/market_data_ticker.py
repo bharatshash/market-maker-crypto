@@ -36,7 +36,9 @@ configuration_ws_streams_testnet = ConfigurationWebSocketStreams(
 client = Spot(config_ws_streams=configuration_ws_streams)
 
 
-def on_message(data):
+from typing import Any
+
+def on_message(data: Any) -> None:
     # process_data(data.model_dump_json())
     try:
         process(data.model_dump_json())  # use model_dump_json() if you want JSON
@@ -45,10 +47,9 @@ def on_message(data):
         # df = process(data.model_dump_json())
 
     except Exception as e:
-        logging.error(f"process_data error: {e}")
+        logging.exception(f"process_data error: {e}")
 
-async def ticker():
-
+async def ticker() -> None:
     """ This function is used to manage the bots ticks and then process the data"""
     connection = None
     try:
@@ -63,11 +64,12 @@ async def ticker():
         # Not establishing full time connection because limit of funds in binance testnet
         # await asyncio.sleep(2)
 
-        if TEST:
+        if(TEST==True):{
             await asyncio.sleep(TICKER_TEST_RUN_TIME)
+        }
         await stream.unsubscribe()
     except Exception as e:
-        logging.error(f"ticker() error: {e}")
+        logging.exception(f"ticker() error: {e}")
     finally:
         if connection:
             await connection.close_connection(close_session=True)
