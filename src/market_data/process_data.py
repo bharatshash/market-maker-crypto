@@ -1,14 +1,14 @@
-import pandas as pd
-import json
-import datetime
-import asyncio
-from order_manager.market_making import make_market
-
 """
     This module is used to process each tick into manageable logical dataframe for 
     proper implementation of relevant strategy.
     
 """
+
+import pandas as pd
+import json
+import datetime
+import asyncio
+from order_manager.market_making import make_market
 
 def process_market_data(data):
     # print(type(data))

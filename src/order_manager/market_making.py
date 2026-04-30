@@ -1,3 +1,20 @@
+"""
+    This module is used to implement market making strategy.
+    It is used to place buy and sell orders in the market.
+
+    run_buy_side function is used to place buy orders in the market.
+
+    run_sell_side function is used to place sell orders in the market.
+
+    make_market function is used to make market in the market.
+
+    the make_market function is the main function that is called by the 
+    process_data module. It also implements a kill switch to stop 
+    the market making process if the kill switch is activated.
+ 
+"""
+
+
 import asyncio
 import pandas as pd
 import json
@@ -19,22 +36,6 @@ from risk_manager.kill_switch import kill_switch
 # Configuration parameters
 BUY_OFFSET = 1000  # Offset to subtract from best_bid for buy orders (in price units)
 DEFAULT_QUANTITY = 0.00847000  # Default quantity for orders
-
-"""
-    This module is used to implement market making strategy.
-    It is used to place buy and sell orders in the market.
-
-    run_buy_side function is used to place buy orders in the market.
-
-    run_sell_side function is used to place sell orders in the market.
-
-    make_market function is used to make market in the market.
-
-    the make_market function is the main function that is called by the 
-    process_data module. It also implements a kill switch to stop 
-    the market making process if the kill switch is activated.
- 
-"""
 
 
 async def run_buy_side(symbol, best_bid):
@@ -135,19 +136,10 @@ async def make_market(df):
         cancel_open_orders(symbol)
         return
 
-    # Multithreading may be unnessary here since asyncio is being used
-    # Add block for adding threads executer for buy side and sell side
-    # with concurrent.futures.ThreadPoolExecutor() as executor:
-    #     loop = asyncio.get_event_loop()
-    #     buy_future = loop.run_in_executor(executor, asyncio.run, run_buy_side(symbol, best_bid))
-    #     sell_future = loop.run_in_executor(executor, asyncio.run, run_sell_side(symbol, best_ask))
-    #     await asyncio.gather(buy_future, sell_future)
-
-    # threading.Thread(target=asyncio.run, args=(run_buy_side(symbol, best_bid),)).start()
-    # threading.Thread(target=asyncio.run, args=(run_sell_side(symbol, best_ask),)).start()
-
-    await run_buy_side(symbol, best_bid)
-    await run_sell_side(symbol, best_ask)
+    await asyncio.gather(
+        run_buy_side(symbol, best_bid),
+        run_sell_side(symbol, best_ask)
+    )
  
 
 

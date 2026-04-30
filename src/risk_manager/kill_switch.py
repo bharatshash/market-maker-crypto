@@ -1,10 +1,11 @@
-from config import KILL_SWITCH_THRESHOLD
-
 """
     This module is used to immedaitely check for price fluctuationsby a certain percentage threshold
     and then kill the bot if the fluctuation is beyond the threshold.
     
 """
+
+from config import KILL_SWITCH_THRESHOLD
+
 class killSwitch:
     def __init__(self, prev_price=None):
         self.active = False

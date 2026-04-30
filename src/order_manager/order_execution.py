@@ -1,21 +1,3 @@
-import asyncio
-import os
-import logging
-
-from binance_sdk_spot.websocket_api.models import AccountCommissionResponse
-from binance_sdk_spot.websocket_api.models import OrderPlaceSideEnum
-from binance_sdk_spot.websocket_api.models import OrderPlaceTypeEnum
-from binance_sdk_spot.websocket_api.models import OrderPlaceTimeInForceEnum
-from .websocket_manager import ws_manager
-# from market_data.process_data import process_exchangeinfo
-
-logging.basicConfig(level=logging.INFO)
-
-# async def get_exchange_info(connection):
-#     exchange_resp = await connection.exchange_info()
-#     process_exchangeinfo(exchange_resp.model_dump_json())
-
-# All the function required for different order executions
 """
     This module is used to execute different types of functions related to your orders in the market.
 
@@ -32,6 +14,20 @@ logging.basicConfig(level=logging.INFO)
 
 
 """
+
+import asyncio
+import os
+import logging
+
+from binance_sdk_spot.websocket_api.models import AccountCommissionResponse
+from binance_sdk_spot.websocket_api.models import OrderPlaceSideEnum
+from binance_sdk_spot.websocket_api.models import OrderPlaceTypeEnum
+from binance_sdk_spot.websocket_api.models import OrderPlaceTimeInForceEnum
+from .websocket_manager import ws_manager
+# from market_data.process_data import process_exchangeinfo
+
+logging.basicConfig(level=logging.INFO)
+
 
 async def place_order(symbol, side, price, quantity, order_type = OrderPlaceTypeEnum["LIMIT"].value, timeInForce = OrderPlaceTimeInForceEnum["GTC"].value):
     """Place an order in the market"""

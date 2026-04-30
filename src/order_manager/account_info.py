@@ -1,15 +1,15 @@
-import asyncio
-import os
-import logging
-
-from .websocket_manager import ws_manager
-
 """
     This module is used to get the account information from the exchange.
     It is used to get the account balances and the open orders.
     It is also used to get the allocations of the user for a symbol.
     
 """
+
+import asyncio
+import os
+import logging
+
+from .websocket_manager import ws_manager
 
 async def get_account_balances():
     """Get all user's account balances"""
