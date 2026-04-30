@@ -4,10 +4,11 @@ import datetime
 import asyncio
 from order_manager.market_making import make_market
 
-# def process_exchangeinfo(data):
-#     exchange_dict = json.loads(data)
-#     df = pd.DataFrame([exchange_dict])
-#     print(df)
+"""
+    This module is used to process each tick into manageable logical dataframe for 
+    proper implementation of relevant strategy.
+    
+"""
 
 def process_market_data(data):
     # print(type(data))

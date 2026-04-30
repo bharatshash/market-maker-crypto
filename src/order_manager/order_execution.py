@@ -16,9 +16,26 @@ logging.basicConfig(level=logging.INFO)
 #     process_exchangeinfo(exchange_resp.model_dump_json())
 
 # All the function required for different order executions
+"""
+    This module is used to execute different types of functions related to your orders in the market.
+
+    It includes the following functions:
+    
+    place_order: Used to place an order in the market.
+
+    cancel_order: Used to cancel an order in the market.
+
+    cancel_open_orders: Used to cancel all open orders in the market.
+
+    The "websocket_manager" class is used to manage the WebSocket connection to the exchange.
+
+
+
+"""
 
 async def place_order(symbol, side, price, quantity, order_type = OrderPlaceTypeEnum["LIMIT"].value, timeInForce = OrderPlaceTimeInForceEnum["GTC"].value):
-
+    """Place an order in the market"""
+    
     async def _place_order_operation(connection, symbol, side, price, quantity, order_type, timeInForce):
         response = await connection.order_place(
             symbol=symbol,
@@ -53,7 +70,7 @@ async def place_order(symbol, side, price, quantity, order_type = OrderPlaceType
 
 
 async def cancel_order(symbol, orig_client_order_id):
-
+    """Cancel an order in the market"""
     async def _cancel_order_operation(connection, symbol, orig_client_order_id):
         response = await connection.order_cancel(
             symbol=symbol,
@@ -83,7 +100,7 @@ async def cancel_order(symbol, orig_client_order_id):
         raise
 
 async def cancel_open_orders(symbol):
-
+    """Cancel all open orders for a symbol"""
     async def _cancel_open_orders_operation(connection, symbol):
         response = await connection.open_orders_cancel_all(
             symbol=symbol

@@ -4,8 +4,16 @@ import logging
 
 from .websocket_manager import ws_manager
 
-async def get_account_balances():
+"""
+    This module is used to get the account information from the exchange.
+    It is used to get the account balances and the open orders.
+    It is also used to get the allocations of the user for a symbol.
+    
+"""
 
+async def get_account_balances():
+    """Get all user's account balances"""
+    
     async def _get_account_balances_operation(connection):
         response = await connection.account_status()
         
@@ -96,7 +104,8 @@ async def get_open_orders(symbol):
         return []
 
 async def has_active_buy_orders(symbol):
-
+    """Check if there are any active BUY orders for the given symbol"""
+    
     print(f"Checking for active BUY orders for {symbol}...")
     open_orders = await get_open_orders(symbol)
     print(f"This section runs!")
@@ -142,6 +151,7 @@ async def has_active_buy_orders(symbol):
     return False
 
 async def has_sell_position(symbol):
+    """Check if there's a position on the sell side for the given symbol"""
 
     balances = await get_account_balances()
 
@@ -238,7 +248,7 @@ async def get_account_info():
         return None
 
 async def allocation(symbol):
-    """Get allocations for a symbol"""
+    """Get all the user's allocations for a symbol"""
     async def _allocation_operation(connection, symbol):
         response = await connection.my_allocations(
             symbol=symbol,

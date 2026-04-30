@@ -15,12 +15,26 @@ from .account_info import has_active_buy_orders
 from .account_info import has_sell_position
 from .account_info import has_active_sell_orders
 from risk_manager.kill_switch import kill_switch
-# from .risk_management.kill_switch import kill_switch
-# from .risk_management.risk_calculation import kill_switch
 
 # Configuration parameters
 BUY_OFFSET = 1000  # Offset to subtract from best_bid for buy orders (in price units)
 DEFAULT_QUANTITY = 0.00847000  # Default quantity for orders
+
+"""
+    This module is used to implement market making strategy.
+    It is used to place buy and sell orders in the market.
+
+    run_buy_side function is used to place buy orders in the market.
+
+    run_sell_side function is used to place sell orders in the market.
+
+    make_market function is used to make market in the market.
+
+    the make_market function is the main function that is called by the 
+    process_data module. It also implements a kill switch to stop 
+    the market making process if the kill switch is activated.
+ 
+"""
 
 
 async def run_buy_side(symbol, best_bid):

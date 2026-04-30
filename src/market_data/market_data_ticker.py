@@ -7,8 +7,16 @@ from binance_sdk_spot.spot import (
     SPOT_WS_STREAMS_PROD_URL,
     ConfigurationWebSocketStreams,
 )
-
 from .process_data import process_market_data as process
+
+from config import TEST, TICKER_TEST_RUN_TIME
+
+"""
+    This module is responsible for getting market data from binance websocket api in the form of streams
+    as ticker and then use that data to be further process by the process_data module in the form of a 
+    dataframe which will be used to make market data table.
+
+"""
 
 
 # Configure logging
@@ -40,6 +48,8 @@ def on_message(data):
         logging.error(f"process_data error: {e}")
 
 async def ticker():
+
+    """ This function is used to manage the bots ticks and then process the data"""
     connection = None
     try:
         connection = await client.websocket_streams.create_connection()
@@ -51,7 +61,11 @@ async def ticker():
 
         # Temporary sleep function until we have a proper shutdown mechanism
         # Not establishing full time connection because limit of funds in binance testnet
-        await asyncio.sleep(2)
+        # await asyncio.sleep(2)
+
+        if(TEST==True):{
+            await asyncio.sleep(TICKER_TEST_RUN_TIME)
+        }
         await stream.unsubscribe()
     except Exception as e:
         logging.error(f"ticker() error: {e}")

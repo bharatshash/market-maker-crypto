@@ -3,15 +3,25 @@ import os
 import logging
 from typing import Optional
 
-from dotenv import load_dotenv
+try:
+    from dotenv import load_dotenv
+except ImportError:
+    def load_dotenv():
+        pass
 from binance_common.configuration import ConfigurationWebSocketAPI
 from binance_common.constants import SPOT_WS_API_TESTNET_URL
 from binance_sdk_spot.spot import Spot
 
-# # Define the Binance API endpoint and related Keys
-# API_KEY = os.getenv("API_KEY")
-# API_SECRET = os.getenv("API_SECRET")
-# stream_url = os.getenv("STREAM_URL")
+""" 
+    This module is used to manage the Websocket connection to the exchange.
+
+    This creates a global instance of the Websocket connection
+
+    The module can be used to establish a new connection, close an existing connection, 
+    reconnect to the exchange, and execute operations with automatic retry on connection failure.
+
+    The module is used by other modules to get the websocket connection.
+"""
 
 load_dotenv()
 API_KEY = os.getenv("API_KEY")
