@@ -11,4 +11,5 @@ KILL_SWITCH_THRESHOLD = 5
 
 # TRADING PARAMETERS
 BUY_OFFSET = 1000  # Offset to subtract from best_bid for buy orders (in price units)
+SELL_OFFSET = 1000 # Offset to add to best_ask for sell orders (in price units)
 DEFAULT_QUANTITY = 0.00847000  # Default quantity for orders

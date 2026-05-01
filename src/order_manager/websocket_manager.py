@@ -1,3 +1,13 @@
+import asyncio
+import os
+import logging
+from typing import Optional
+
+from dotenv import load_dotenv
+from binance_common.configuration import ConfigurationWebSocketAPI
+from binance_common.constants import SPOT_WS_API_TESTNET_URL
+from binance_sdk_spot.spot import Spot
+
 """ 
     This module is used to manage the Websocket connection to the exchange.
 
@@ -8,20 +18,6 @@
 
     The module is used by other modules to get the websocket connection.
 """
-
-import asyncio
-import os
-import logging
-from typing import Optional
-
-try:
-    from dotenv import load_dotenv
-except ImportError:
-    def load_dotenv():
-        pass
-from binance_common.configuration import ConfigurationWebSocketAPI
-from binance_common.constants import SPOT_WS_API_TESTNET_URL
-from binance_sdk_spot.spot import Spot
 
 load_dotenv()
 API_KEY = os.getenv("API_KEY")

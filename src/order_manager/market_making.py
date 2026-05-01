@@ -28,13 +28,13 @@ from .order_execution import cancel_order
 from .account_info import get_account_info
 from .account_info import allocation
 from .account_info import has_buy_position
-from .account_info import has_active_buy_orders
 from .account_info import has_sell_position
-from .account_info import has_active_sell_orders
+from .account_info import has_active_orders
 from risk_manager.kill_switch import kill_switch
+from typing import Dict, Any
 
 import logging
-from config import BUY_OFFSET, DEFAULT_QUANTITY
+from config import BUY_OFFSET, SELL_OFFSET,DEFAULT_QUANTITY
 
 logger = logging.getLogger(__name__)
 
@@ -45,7 +45,7 @@ async def run_buy_side(symbol: str, best_bid: float) -> None:
         # has_buy_orders = asyncio.create_task(has_active_buy_orders(symbol))
         # has_buy_pos = asyncio.create_task(has_buy_position(symbol))
 
-        has_buy_orders = await has_active_buy_orders(symbol)
+        has_buy_orders = await has_active_orders(symbol, 'BUY')
         has_buy_pos = await has_buy_position(symbol)
 
         # If no active buy order and no active position on buy side
@@ -79,15 +79,15 @@ async def run_sell_side(symbol: str, best_ask: float) -> None:
      # Here add code to check for active sell order and position and place limit order
 
     try:
-        has_sell_orders = await has_active_sell_orders(symbol) 
+        has_sell_orders = await has_active_orders(symbol, 'SELL') 
         has_sell_pos = await has_sell_position(symbol)
 
         # If no active sell order and no active position on sell side
         if not has_sell_orders and not has_sell_pos:
             # Compute sell price: ask_price = best_ask + sell_offset
-            ask_price = best_ask + BUY_OFFSET  # Using BUY_OFFSET as placeholder
+            ask_price = best_ask + SELL_OFFSET  
             
-            logger.info(f"Placing sell order at {ask_price} (best_ask: {best_ask}, offset: {BUY_OFFSET})")
+            logger.info(f"Placing sell order at {ask_price} (best_ask: {best_ask}, offset: {SELL_OFFSET})")
             
             # Place limit sell order
             await place_order(
@@ -108,14 +108,15 @@ async def run_sell_side(symbol: str, best_ask: float) -> None:
     except Exception as e:
         logger.exception(f"Error checking orders/positions or placing sell order: {e}")
 
-async def make_market(df: pd.DataFrame) -> None:
+async def make_market(data: Dict[str, Any]) -> None:
     
 
     # Extract market data from the processed data
-    symbol = df['Symbol'].values[0]
-    last_price = float(df['Last price'].values[0])
-    best_bid = float(df['Best bid price'].values[0])
-    best_ask = float(df['Best ask price'].values[0])
+    # symbol = data['Symbol'].value[0]
+    symbol = data['Symbol']
+    last_price = float(data['Last price'])
+    best_bid = float(data['Best bid price'])
+    best_ask = float(data['Best ask price'])
 
      # Define your market making strategy here
 
@@ -134,16 +135,3 @@ async def make_market(df: pd.DataFrame) -> None:
         run_buy_side(symbol, best_bid),
         run_sell_side(symbol, best_ask)
     )
- 
-
-
-    # orderId = 'nRS6OvQsX93tUsM0B0UMcz'
-    # print(f"Cancelling Buy Order: {symbol} for {orderId}")
-    # # place_order(symbol, 'BUY', buy_price, quantity, order_type='LIMIT')
-    # # asyncio.create_task(cancel_order(symbol, orderId))
-
-
-    # asyncio.create_task(get_account_info())
-    # asyncio.create_task(allocation(symbol))
-    
-    # await get_account_info()

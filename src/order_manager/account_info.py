@@ -103,10 +103,10 @@ async def get_open_orders(symbol: str) -> Any:
         logging.exception(f"get_open_orders() connection error: {e}")
         return []
 
-async def has_active_buy_orders(symbol: str) -> bool:
+async def has_active_orders(symbol: str, side: str) -> bool:
     """Check if there are any active BUY orders for the given symbol"""
     
-    logging.info(f"Checking for active BUY orders for {symbol}...")
+    logging.info(f"Checking for active {side} orders for {symbol}...")
     open_orders = await get_open_orders(symbol)
 
     if open_orders is None:
@@ -143,8 +143,8 @@ async def has_active_buy_orders(symbol: str) -> bool:
     
     # Check if any of the open orders are BUY orders
     for order in orders_to_check:
-        if isinstance(order, dict) and order.get('side') == 'BUY':
-            logging.info(f"Found active BUY order for {symbol}: {order}")
+        if isinstance(order, dict) and order.get('side') == side:
+            logging.info(f"Found active {side} order for {symbol}: {order}")
             return True
     
     return False
@@ -174,50 +174,6 @@ async def has_sell_position(symbol: str) -> bool:
                     return True
 
     logging.info(f"No active SELL position found for {symbol}")
-    return False
-
-async def has_active_sell_orders(symbol: str) -> bool:
-    """Check if there are any active SELL orders for the given symbol"""
-    open_orders = await get_open_orders(symbol)
-    
-    # Handle different response types
-    if open_orders is None:
-        return False
-    
-    # If it's a list, check length directly
-    if isinstance(open_orders, list):
-        if len(open_orders) == 0:
-            return False
-        orders_to_check = open_orders
-    # If it's a dict, look for orders in common keys
-    elif isinstance(open_orders, dict):
-        # Try common keys where orders might be stored
-        orders_to_check = open_orders.get('orders', open_orders.get('data', []))
-        if not isinstance(orders_to_check, list):
-            orders_to_check = []
-        if len(orders_to_check) == 0:
-            return False
-    else:
-        # If it's neither list nor dict, try to get length if possible
-        try:
-            if hasattr(open_orders, '__len__') and len(open_orders) == 0:
-                return False
-            # If it's an object with an orders attribute
-            if hasattr(open_orders, 'orders'):
-                orders_to_check = open_orders.orders
-            else:
-                # Log the type for debugging
-                logging.warning(f"Unexpected open_orders type: {type(open_orders)}")
-                return False
-        except TypeError:
-            logging.error(f"Cannot check length of open_orders type: {type(open_orders)}")
-            return False
-    
-    # Check if any of the open orders are SELL orders
-    for order in orders_to_check:
-        if isinstance(order, dict) and order.get('side') == 'SELL':
-            return True
-    
     return False
 
 async def get_account_info() -> Optional[Any]:
