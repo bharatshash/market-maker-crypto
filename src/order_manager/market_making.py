@@ -82,6 +82,7 @@ async def run_sell_side(symbol: str, best_ask: float) -> None:
         has_sell_orders = await has_active_orders(symbol, 'SELL') 
         has_sell_pos = await has_sell_position(symbol)
 
+
         # If no active sell order and no active position on sell side
         if not has_sell_orders and not has_sell_pos:
             # Compute sell price: ask_price = best_ask + sell_offset
@@ -131,7 +132,11 @@ async def make_market(data: Dict[str, Any]) -> None:
         await cancel_open_orders(symbol)
         return
 
-    await asyncio.gather(
-        run_buy_side(symbol, best_bid),
-        run_sell_side(symbol, best_ask)
-    )
+    # await asyncio.gather(
+    #     run_buy_side(symbol, best_bid),
+    #     run_sell_side(symbol, best_ask)
+    # )
+
+    curr_allocations = await allocation(symbol)
+
+    logger.info("CUrrent Holdings: " + str(curr_allocations))

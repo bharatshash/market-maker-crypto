@@ -36,6 +36,19 @@ async def get_account_balances() -> Optional[Any]:
         logging.exception(f"get_account_balances() error: {e}")
         return None
 
+async def get_liquid_balance(quote_asset: str) -> Optional[float]:
+    """Get the liquid balance for a specific quote asset"""
+    balances = await get_account_balances()
+
+    if balances is None:
+        return None
+
+    if hasattr(balances.result, 'balances'):
+        for balance in balances.result.balances:
+            if balance.asset == quote_asset:
+                return float(balance.free)
+    return None
+
 def extract_base_asset(symbol: str) -> str:
     for quote in ['USDT', 'BUSD', 'BTC', 'ETH']:
         if symbol.endswith(quote):

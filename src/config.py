@@ -1,4 +1,3 @@
-# BOT RUNTIME VARIABLE
 TEST = True
 TICKER_TEST_RUN_TIME = 10
 # IF TEST OR UNINTERRUPTED TRADING BOOL VARIABLE
@@ -10,6 +9,7 @@ KILL_SWITCH_THRESHOLD = 5
 # MINIMUM PROFIT
 
 # TRADING PARAMETERS
+BASE_ASSET = "USDT"
 BUY_OFFSET = 1000  # Offset to subtract from best_bid for buy orders (in price units)
 SELL_OFFSET = 1000 # Offset to add to best_ask for sell orders (in price units)
 DEFAULT_QUANTITY = 0.00847000  # Default quantity for orders
